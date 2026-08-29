@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Mater Dei Betim-Contagem - Faturamento e Fluxo de Gastos</title>
+    <style>
+        :root {
+            --primary: #1B365D;
+            --primary-dark: #12243F;
+            --accent: #D9E1F2;
+            --success: #0F5132;
+            --success-bg: #D1E7DD;
+            --danger: #842029;
+            --danger-bg: #F8D7DA;
+            --bg-color: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text-main: #212529;
+            --text-muted: #6C757D;
+            --border-color: #DEE2E6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        /* Header Institucional */
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #FFFFFF;
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .badge-unit {
+            background: rgba(255,255,255,0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* Seções */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 24px 32px 16px 32px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Dados do Paciente - Grid Responsivo */
+        .patient-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            padding: 0 32px;
+        }
+
+        .patient-card {
+            background: #F8F9FA;
+            border: 1px solid var(--border-color);
+            padding: 14px 18px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .patient-card label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .patient-card span, .patient-card input, .patient-card select {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .patient-card input, .patient-card select {
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            border-radius: 4px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .patient-card input:focus, .patient-card select:focus {
+            border-color: var(--primary);
+        }
+
+        /* Tabela de Lançamentos Responsiva */
+        .table-container {
+            padding: 0 32px;
+            overflow-x: auto;
+            margin-bottom: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1050px;
+            background: #FFFFFF;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            padding: 12px 10px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background-color: #F8F9FA;
+        }
+
+        select, input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            background: #FFFFFF;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(27, 54, 93, 0.1);
+        }
+
+        .status-select {
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-pago {
+            background-color: var(--success-bg);
+            color: var(--success);
+            border-color: #A3CFBB;
+        }
+
+        .status-pendente {
+            background-color: var(--danger-bg);
+            color: var(--danger);
+            border-color: #F1AEB5;
+        }
+
+        /* Resumo Financeiro & Status Geral */
+        .summary-section {
+            background: #F1F3F5;
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        /* Quadrado no Canto Inferior Esquerdo */
+        .status-box {
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 2px solid currentColor;
+            transition: all 0.3s ease;
+        }
+
+        .status-box.liberado {
+            background-color: var(--success-bg);
+            color: var(--success);
+            border-color: #0F5132;
+        }
+
+        .status-box.pendente {
+            background-color: var(--danger-bg);
+            color: var(--danger);
+            border-color: #842029;
+        }
+
+        .status-box-icon {
+            font-size: 1.4rem;
+        }
+
+        .summary-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            width: 380px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+            padding-top: 12px;
+            border-top: 2px dashed var(--border-color);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        /* Ações e Botões */
+        .actions-bar {
+            padding: 20px 32px;
+            background: #FFFFFF;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: #FFFFFF;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: #6C757D;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5C636A;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-danger:hover {
+            background-color: #bd2130;
+        }
+
+        /* Responsividade para Celulares */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .header {
+                padding: 16px 20px;
+            }
+            .section-title, .patient-grid, .table-container, .summary-section, .actions-bar {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+            .summary-card, .status-box {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div>
+            <h1>Hospital Mater Dei</h1>
+            <p>Controle de Faturamento e Fluxo de Gastos - Paciente Particular</p>
+        </div>
+        <div class="badge-unit">Betim-Contagem</div>
+    </div>
+
+    <!-- Dados do Paciente -->
+    <div class="section-title">🏥 Dados Cadastrais do Paciente</div>
+    <div class="patient-grid">
+        <div class="patient-card">
+            <label>Nome Completo</label>
+            <input type="text" value="Luanna Silva Santos">
+        </div>
+        <div class="patient-card">
+            <label>Idade</label>
+            <input type="number" value="29">
+        </div>
+        <div class="patient-card">
+            <label>CPF / RG</label>
+            <input type="text" value="123.456.789-00 / MG-15.892.411">
+        </div>
+        <div class="patient-card">
+            <label>Possui Deficiência?</label>
+            <select>
+                <option value="">-- Selecione --</option>
+                <option value="Não" selected>Não</option>
+                <option value="Sim - Física">Sim - Física</option>
+                <option value="Sim - Auditiva">Sim - Auditiva</option>
+                <option value="Sim - Visual">Sim - Visual</option>
+                <option value="Sim - Intelectual">Sim - Intelectual</option>
+            </select>
+        </div>
+        <div class="patient-card" style="grid-column: span 2;">
+            <label>Estado de Saúde Atual</label>
+            <input type="text" value="Estável, em observação pós-procedimento">
+        </div>
+        <div class="patient-card">
+            <label>Valor Inicial Pago (Caução)</label>
+            <input type="text" id="inputCaucao" value="5.000,00" style="color: var(--success); font-weight: bold;" oninput="calcularTotal()">
+        </div>
+    </div>
+
+    <!-- Tabela de Lançamentos -->
+    <div class="section-title">📋 Lançamento de Especialidades e Exames</div>
+    <div class="table-container">
+        <table id="faturamentoTable">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">Slot</th>
+                    <th style="width: 200px;">Especialidade Médica</th>
+                    <th>Exame / Procedimento</th>
+                    <th style="width: 120px;">Cód. Exame</th>
+                    <th style="width: 120px;">Valor (R$)</th>
+                    <th style="width: 180px;">Funcionário</th>
+                    <th style="width: 130px;">Status</th>
+                    <th style="width: 90px;">Hora</th>
+                    <th style="width: 60px;">Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Conteúdo Populado Dinamicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Ações e Botões -->
+    <div class="actions-bar">
+        <button class="btn btn-secondary" onclick="adicionarSlot()">+ Adicionar Novo Slot</button>
+        <span style="font-size: 0.855rem; color: var(--text-muted);">Hospital Mater Dei Betim-Contagem • Sistema de Faturamento v2.0</span>
+    </div>
+
+    <!-- Resumo Financeiro & Quadrado de Status Inferior Esquerdo -->
+    <div class="summary-section">
+        <!-- Quadrado no Canto Inferior Esquerdo (Status Geral) -->
+        <div id="statusBox" class="status-box liberado">
+            <span class="status-box-icon" id="statusBoxIcon">✔</span>
+            <span id="statusBoxText">LIBERADO</span>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-row">
+                <span>Valor Total Gasto:</span>
+                <strong id="lblTotal">R$ 0,00</strong>
+            </div>
+            <div class="summary-row">
+                <span>Valor Inicial Pago (Caução):</span>
+                <strong style="color: var(--success);" id="lblCaucao">R$ 5.000,00</strong>
+            </div>
+            <div class="summary-row">
+                <span>Saldo / Reembolso:</span>
+                <strong id="lblSaldo" style="color: var(--success);">R$ 5.000,00 (Crédito)</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Catálogo de Exames com Códigos e Valores Pré-definidos
+    const listaExames = [
+        { nome: "Consulta Médica Inicial", codigo: "CONS-01", valor: "350,00" },
+        { nome: "Raio-X (Radiografia)", codigo: "RX-78", valor: "200,00" },
+        { nome: "Ultrassonografia (Ultrassom)", codigo: "USG-02", valor: "450,00" },
+        { nome: "Tomografia Computadorizada", codigo: "TC-03", valor: "1.100,00" },
+        { nome: "Ressonância Magnética", codigo: "RM-09", valor: "1.850,00" },
+        { nome: "Eletrocardiograma (ECG)", codigo: "ECG-05", valor: "180,00" },
+        { nome: "Hemograma Completo", codigo: "LAB-12", valor: "85,00" },
+        { nome: "Exame de Urina (EAS)", codigo: "LAB-15", valor: "45,00" },
+        { nome: "Endoscopia Digestiva", codigo: "END-04", valor: "750,00" }
+    ];
+
+    // Lista de Especialidades
+    const listaEspecialidades = [
+        "Clínica Médica",
+        "Cardiologia",
+        "Cirurgia Geral",
+        "Ginecologia e Obstetrícia",
+        "Ortopedia e Traumatologia",
+        "Pediatria",
+        "Neurologia",
+        "Urologia",
+        "Dermatologia",
+        "Otorrinolaringologia",
+        "Mastologia e Cirurgia Ginecológica"
+    ];
+
+    // Lista de Funcionários
+    const listaFuncionarios = [
+        "Mariana Souza",
+        "Carlos Eduardo",
+        "Roberto Alves",
+        "Fernanda Lima",
+        "Juliana Paes",
+        "Lucas Mendes",
+        "Beatriz Rocha"
+    ];
+
+    // Dados Iniciais dos Slots Predefinidos
+    const slotsIniciais = [
+        { esp: "Cardiologia", exameIdx: 0, func: "Mariana Souza", status: "pago", hora: "08:30" },
+        { esp: "Ortopedia e Traumatologia", exameIdx: 1, func: "Mariana Souza", status: "pago", hora: "09:15" },
+        { esp: "Ginecologia e Obstetrícia", exameIdx: 2, func: "Carlos Eduardo", status: "pendente", hora: "10:00" },
+        { esp: "Clínica Médica", exameIdx: 3, func: "Carlos Eduardo", status: "pendente", hora: "11:30" }
+    ];
+
+    let slotCount = 0;
+
+    function gerarOpcoesSelect(array, valorSelecionado = "", incluirEmBranco = true) {
+        let html = incluirEmBranco ? '<option value="">-- Selecione --</option>' : '';
+        array.forEach(item => {
+            const val = typeof item === 'object' ? item.nome : item;
+            const selected = val === valorSelecionado ? 'selected' : '';
+            html += `<option value="${val}" ${selected}>${val}</option>`;
+        });
+        return html;
+    }
+
+    function gerarOpcoesCodigos(valorSelecionado = "") {
+        let html = '<option value="">-- Selecione --</option>';
+        listaExames.forEach(exame => {
+            const selected = exame.codigo === valorSelecionado ? 'selected' : '';
+            html += `<option value="${exame.codigo}" ${selected}>${exame.codigo}</option>`;
+        });
+        return html;
+    }
+
+    function aoMudarExame(selectEl) {
+        const tr = selectEl.closest('tr');
+        const codSelect = tr.querySelector('.cod-select');
+        const valorInput = tr.querySelector('.valor-input');
+
+        const exameSelecionado = listaExames.find(e => e.nome === selectEl.value);
+
+        if (exameSelecionado) {
+            codSelect.value = exameSelecionado.codigo;
+            valorInput.value = exameSelecionado.valor;
+        } else {
+            codSelect.value = "";
+            valorInput.value = "";
+        }
+        calcularTotal();
+    }
+
+    function aoMudarCodigo(selectEl) {
+        const tr = selectEl.closest('tr');
+        const exameSelect = tr.querySelector('.exame-select');
+        const valorInput = tr.querySelector('.valor-input');
+
+        const exameSelecionado = listaExames.find(e => e.codigo === selectEl.value);
+
+        if (exameSelecionado) {
+            exameSelect.value = exameSelecionado.nome;
+            valorInput.value = exameSelecionado.valor;
+        } else {
+            exameSelect.value = "";
+            valorInput.value = "";
+        }
+        calcularTotal();
+    }
+
+    function mudarCorStatus(select) {
+        if (select.value === 'pago') {
+            select.className = 'status-select status-pago';
+        } else if (select.value === 'pendente') {
+            select.className = 'status-select status-pendente';
+        } else {
+            select.className = 'status-select';
+        }
+        calcularTotal();
+    }
+
+    function criarLinhaSlot(dados = {}) {
+        slotCount++;
+        const tbody = document.querySelector('#faturamentoTable tbody');
+        const tr = document.createElement('tr');
+
+        const espHtml = gerarOpcoesSelect(listaEspecialidades, dados.esp || "");
+        const exameHtml = gerarOpcoesSelect(listaExames, dados.exameObj ? dados.exameObj.nome : "");
+        const codHtml = gerarOpcoesCodigos(dados.exameObj ? dados.exameObj.codigo : "");
+        const funcHtml = gerarOpcoesSelect(listaFuncionarios, dados.func || "");
+        
+        const valorInicial = dados.exameObj ? dados.exameObj.valor : "";
+        const statusVal = dados.status || "";
+        const horaVal = dados.hora || "12:00";
+        
+        let statusClass = "status-select";
+        if (statusVal === "pago") statusClass += " status-pago";
+        if (statusVal === "pendente") statusClass += " status-pendente";
+
+        tr.innerHTML = `
+            <td><strong>#${slotCount}</strong></td>
+            <td>
+                <select class="esp-select">
+                    ${espHtml}
+                </select>
+            </td>
+            <td>
+                <select class="exame-select" onchange="aoMudarExame(this)">
+                    ${exameHtml}
+                </select>
+            </td>
+            <td>
+                <select class="cod-select" style="text-align: center;" onchange="aoMudarCodigo(this)">
+                    ${codHtml}
+                </select>
+            </td>
+            <td>
+                <input type="text" value="${valorInicial}" placeholder="0,00" class="valor-input" oninput="calcularTotal()">
+            </td>
+            <td>
+                <select class="func-select">
+                    ${funcHtml}
+                </select>
+            </td>
+            <td>
+                <select class="${statusClass}" onchange="mudarCorStatus(this)">
+                    <option value="" ${statusVal === "" ? "selected" : ""}>-- Selecione --</option>
+                    <option value="pago" ${statusVal === "pago" ? "selected" : ""}>Pago</option>
+                    <option value="pendente" ${statusVal === "pendente" ? "selected" : ""}>Pendente</option>
+                </select>
+            </td>
+            <td><input type="text" value="${horaVal}" style="text-align: center;"></td>
+            <td><button class="btn btn-danger" onclick="removerSlot(this)">✕</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function adicionarSlot() {
+        criarLinhaSlot();
+        calcularTotal();
+    }
+
+    function removerSlot(btn) {
+        const tr = btn.closest('tr');
+        tr.remove();
+        recalcularIndicesSlots();
+        calcularTotal();
+    }
+
+    function recalcularIndicesSlots() {
+        const rows = document.querySelectorAll('#faturamentoTable tbody tr');
+        slotCount = 0;
+        rows.forEach(tr => {
+            slotCount++;
+            tr.cells[0].innerHTML = `<strong>#${slotCount}</strong>`;
+        });
+    }
+
+    function calcularTotal() {
+        const inputs = document.querySelectorAll('.valor-input');
+        let total = 0;
+        let temPendente = false;
+
+        inputs.forEach(input => {
+            let valStr = input.value.replace(/\./g, '').replace(',', '.');
+            let val = parseFloat(valStr);
+            if (!isNaN(val)) {
+                total += val;
+            }
+        });
+
+        // Verificar status dos lançamentos
+        const statusSelects = document.querySelectorAll('.status-select');
+        statusSelects.forEach(sel => {
+            if (sel.value === 'pendente') {
+                temPendente = true;
+            }
+        });
+
+        document.getElementById('lblTotal').innerText = 'R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        // Ler Caução do Input
+        let caucaoStr = document.getElementById('inputCaucao').value.replace(/\./g, '').replace(',', '.');
+        let caucao = parseFloat(caucaoStr);
+        if (isNaN(caucao)) caucao = 0;
+
+        document.getElementById('lblCaucao').innerText = 'R$ ' + caucao.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        const saldo = caucao - total;
+        const saldoEl = document.getElementById('lblSaldo');
+        
+        if (saldo >= 0) {
+            saldoEl.style.color = 'var(--success)';
+            saldoEl.innerText = 'R$ ' + saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' (Crédito)';
+        } else {
+            saldoEl.style.color = 'var(--danger)';
+            saldoEl.innerText = 'R$ ' + Math.abs(saldo).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' (A Pagar)';
+        }
+
+        // Atualizar Quadrado de Status no Canto Inferior Esquerdo (LIBERADO / PENDENTE)
+        const statusBox = document.getElementById('statusBox');
+        const statusBoxText = document.getElementById('statusBoxText');
+        const statusBoxIcon = document.getElementById('statusBoxIcon');
+
+        if (!temPendente && saldo >= 0) {
+            statusBox.className = 'status-box liberado';
+            statusBoxText.innerText = 'LIBERADO';
+            statusBoxIcon.innerText = '✔';
+        } else {
+            statusBox.className = 'status-box pendente';
+            statusBoxText.innerText = 'PENDENTE';
+            statusBoxIcon.innerText = '✖';
+        }
+    }
+
+    // Inicialização da Página
+    window.onload = function() {
+        slotsIniciais.forEach(item => {
+            criarLinhaSlot({
+                esp: item.esp,
+                exameObj: listaExames[item.exameIdx],
+                func: item.func,
+                status: item.status,
+                hora: item.hora
+            });
+        });
+        calcularTotal();
+    };
+</script>
+
+</body>
+</html>
