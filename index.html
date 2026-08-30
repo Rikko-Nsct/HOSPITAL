@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital Mater Dei Betim-Contagem - Faturamento e Fluxo de Gastos</title>
+    <title>Hospital Mater Dei Betim-Contagem - Gestão de Pacientes</title>
     <style>
         :root {
             --primary: #1B365D;
@@ -75,7 +75,7 @@
             border: 1px solid rgba(255,255,255,0.3);
         }
 
-        /* Seções */
+        /* Seções e Títulos */
         .section-title {
             font-size: 1.1rem;
             font-weight: 700;
@@ -88,50 +88,44 @@
             gap: 8px;
         }
 
-        /* Dados do Paciente - Grid Responsivo */
-        .patient-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
+        /* Barra de Busca */
+        .search-container {
             padding: 0 32px;
+            margin-bottom: 20px;
         }
 
-        .patient-card {
-            background: #F8F9FA;
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            font-size: 1rem;
             border: 1px solid var(--border-color);
-            padding: 14px 18px;
             border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .patient-card label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .patient-card span, .patient-card input, .patient-card select {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .patient-card input, .patient-card select {
-            border: 1px solid var(--border-color);
-            padding: 6px 10px;
-            border-radius: 4px;
             outline: none;
-            font-family: inherit;
+            transition: all 0.2s;
+            background-color: #FFFFFF;
         }
 
-        .patient-card input:focus, .patient-card select:focus {
+        .search-box input:focus {
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(27, 54, 93, 0.1);
         }
 
-        /* Tabela de Lançamentos Responsiva */
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            opacity: 0.6;
+        }
+
+        /* Tabela Responsiva */
         .table-container {
             padding: 0 32px;
             overflow-x: auto;
@@ -141,7 +135,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1050px;
+            min-width: 800px;
             background: #FFFFFF;
         }
 
@@ -151,12 +145,12 @@
             font-weight: 600;
             font-size: 0.85rem;
             text-transform: uppercase;
-            padding: 12px 10px;
+            padding: 14px 12px;
             text-align: left;
         }
 
         td {
-            padding: 10px;
+            padding: 12px;
             border-bottom: 1px solid var(--border-color);
             font-size: 0.9rem;
             vertical-align: middle;
@@ -166,105 +160,27 @@
             background-color: #F8F9FA;
         }
 
-        select, input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            background: #FFFFFF;
-        }
-
-        select:focus, input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(27, 54, 93, 0.1);
-        }
-
-        .status-select {
-            font-weight: 600;
+        /* Badges de Status */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
             text-align: center;
         }
 
-        .status-pago {
+        .status-badge.liberado {
             background-color: var(--success-bg);
             color: var(--success);
-            border-color: #A3CFBB;
+            border: 1px solid #A3CFBB;
         }
 
-        .status-pendente {
+        .status-badge.pendente {
             background-color: var(--danger-bg);
             color: var(--danger);
-            border-color: #F1AEB5;
-        }
-
-        /* Resumo Financeiro & Status Geral */
-        .summary-section {
-            background: #F1F3F5;
-            padding: 24px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid var(--border-color);
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        /* Quadrado no Canto Inferior Esquerdo */
-        .status-box {
-            padding: 16px 24px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            border: 2px solid currentColor;
-            transition: all 0.3s ease;
-        }
-
-        .status-box.liberado {
-            background-color: var(--success-bg);
-            color: var(--success);
-            border-color: #0F5132;
-        }
-
-        .status-box.pendente {
-            background-color: var(--danger-bg);
-            color: var(--danger);
-            border-color: #842029;
-        }
-
-        .status-box-icon {
-            font-size: 1.4rem;
-        }
-
-        .summary-card {
-            background: #FFFFFF;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            width: 380px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 0.95rem;
-        }
-
-        .summary-row:last-child {
-            margin-bottom: 0;
-            padding-top: 12px;
-            border-top: 2px dashed var(--border-color);
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--primary);
+            border: 1px solid #F1AEB5;
         }
 
         /* Ações e Botões */
@@ -289,6 +205,10 @@
             cursor: pointer;
             transition: background 0.2s;
             font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn:hover {
@@ -317,7 +237,14 @@
             background-color: #bd2130;
         }
 
-        /* Responsividade para Celulares */
+        .empty-message {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Responsividade */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -325,12 +252,9 @@
             .header {
                 padding: 16px 20px;
             }
-            .section-title, .patient-grid, .table-container, .summary-section, .actions-bar {
+            .section-title, .search-container, .table-container, .actions-bar {
                 padding-left: 16px;
                 padding-right: 16px;
-            }
-            .summary-card, .status-box {
-                width: 100%;
             }
         }
     </style>
@@ -342,361 +266,147 @@
     <div class="header">
         <div>
             <h1>Hospital Mater Dei</h1>
-            <p>Controle de Faturamento e Fluxo de Gastos - Paciente Particular</p>
+            <p>Painel de Controle e Acompanhamento de Pacientes</p>
         </div>
         <div class="badge-unit">Betim-Contagem</div>
     </div>
 
-    <!-- Dados do Paciente -->
-    <div class="section-title">🏥 Dados Cadastrais do Paciente</div>
-    <div class="patient-grid">
-        <div class="patient-card">
-            <label>Nome Completo</label>
-            <input type="text" value="Luanna Silva Santos">
-        </div>
-        <div class="patient-card">
-            <label>Idade</label>
-            <input type="number" value="29">
-        </div>
-        <div class="patient-card">
-            <label>CPF / RG</label>
-            <input type="text" value="123.456.789-00 / MG-15.892.411">
-        </div>
-        <div class="patient-card">
-            <label>Possui Deficiência?</label>
-            <select>
-                <option value="">-- Selecione --</option>
-                <option value="Não" selected>Não</option>
-                <option value="Sim - Física">Sim - Física</option>
-                <option value="Sim - Auditiva">Sim - Auditiva</option>
-                <option value="Sim - Visual">Sim - Visual</option>
-                <option value="Sim - Intelectual">Sim - Intelectual</option>
-            </select>
-        </div>
-        <div class="patient-card" style="grid-column: span 2;">
-            <label>Estado de Saúde Atual</label>
-            <input type="text" value="Estável, em observação pós-procedimento">
-        </div>
-        <div class="patient-card">
-            <label>Valor Inicial Pago (Caução)</label>
-            <input type="text" id="inputCaucao" value="5.000,00" style="color: var(--success); font-weight: bold;" oninput="calcularTotal()">
+    <!-- Barra de Busca -->
+    <div class="section-title">🔍 Localizar Paciente</div>
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Digite o nome do paciente para buscar..." onkeyup="filtrarPacientes()">
         </div>
     </div>
 
-    <!-- Tabela de Lançamentos -->
-    <div class="section-title">📋 Lançamento de Especialidades e Exames</div>
+    <!-- Tabela de Pacientes -->
+    <div class="section-title">👥 Relação de Pacientes Cadastrados</div>
     <div class="table-container">
-        <table id="faturamentoTable">
+        <table id="pacientesTable">
             <thead>
                 <tr>
-                    <th style="width: 50px;">Slot</th>
-                    <th style="width: 200px;">Especialidade Médica</th>
-                    <th>Exame / Procedimento</th>
-                    <th style="width: 120px;">Cód. Exame</th>
-                    <th style="width: 120px;">Valor (R$)</th>
-                    <th style="width: 180px;">Funcionário</th>
-                    <th style="width: 130px;">Status</th>
-                    <th style="width: 90px;">Hora</th>
-                    <th style="width: 60px;">Ação</th>
+                    <th>Nome do Paciente</th>
+                    <th style="width: 220px; text-align: center;">Planilha de Faturamento</th>
+                    <th style="width: 180px; text-align: center;">Status de Liberação</th>
+                    <th style="width: 140px; text-align: center;">Hora de Criação</th>
+                    <th style="width: 90px; text-align: center;">Ação</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Conteúdo Populado Dinamicamente -->
+            <tbody id="pacientesTableBody">
+                <!-- Conteúdo Populado Via JavaScript -->
             </tbody>
         </table>
     </div>
 
-    <!-- Ações e Botões -->
+    <!-- Botão de Novo Paciente e Rodapé -->
     <div class="actions-bar">
-        <button class="btn btn-secondary" onclick="adicionarSlot()">+ Adicionar Novo Slot</button>
+        <button class="btn" onclick="adicionarNovoPaciente()">+ Novo Paciente</button>
         <span style="font-size: 0.855rem; color: var(--text-muted);">Hospital Mater Dei Betim-Contagem • Sistema de Faturamento v2.0</span>
-    </div>
-
-    <!-- Resumo Financeiro & Quadrado de Status Inferior Esquerdo -->
-    <div class="summary-section">
-        <!-- Quadrado no Canto Inferior Esquerdo (Status Geral) -->
-        <div id="statusBox" class="status-box liberado">
-            <span class="status-box-icon" id="statusBoxIcon">✔</span>
-            <span id="statusBoxText">LIBERADO</span>
-        </div>
-
-        <div class="summary-card">
-            <div class="summary-row">
-                <span>Valor Total Gasto:</span>
-                <strong id="lblTotal">R$ 0,00</strong>
-            </div>
-            <div class="summary-row">
-                <span>Valor Inicial Pago (Caução):</span>
-                <strong style="color: var(--success);" id="lblCaucao">R$ 5.000,00</strong>
-            </div>
-            <div class="summary-row">
-                <span>Saldo / Reembolso:</span>
-                <strong id="lblSaldo" style="color: var(--success);">R$ 5.000,00 (Crédito)</strong>
-            </div>
-        </div>
     </div>
 </div>
 
 <script>
-    // Catálogo de Exames com Códigos e Valores Pré-definidos
-    const listaExames = [
-        { nome: "Consulta Médica Inicial", codigo: "CONS-01", valor: "350,00" },
-        { nome: "Raio-X (Radiografia)", codigo: "RX-78", valor: "200,00" },
-        { nome: "Ultrassonografia (Ultrassom)", codigo: "USG-02", valor: "450,00" },
-        { nome: "Tomografia Computadorizada", codigo: "TC-03", valor: "1.100,00" },
-        { nome: "Ressonância Magnética", codigo: "RM-09", valor: "1.850,00" },
-        { nome: "Eletrocardiograma (ECG)", codigo: "ECG-05", valor: "180,00" },
-        { nome: "Hemograma Completo", codigo: "LAB-12", valor: "85,00" },
-        { nome: "Exame de Urina (EAS)", codigo: "LAB-15", valor: "45,00" },
-        { nome: "Endoscopia Digestiva", codigo: "END-04", valor: "750,00" }
+    // Dados padrão de demonstração
+    const pacientesPadrao = [
+        { id: 1, nome: "Luanna Silva Santos", status: "liberado", hora: "08:30" },
+        { id: 2, nome: "Carlos Eduardo Moreira", status: "pendente", hora: "09:15" },
+        { id: 3, nome: "Mariana Souza Lima", status: "liberado", hora: "10:45" }
     ];
 
-    // Lista de Especialidades
-    const listaEspecialidades = [
-        "Clínica Médica",
-        "Cardiologia",
-        "Cirurgia Geral",
-        "Ginecologia e Obstetrícia",
-        "Ortopedia e Traumatologia",
-        "Pediatria",
-        "Neurologia",
-        "Urologia",
-        "Dermatologia",
-        "Otorrinolaringologia",
-        "Mastologia e Cirurgia Ginecológica"
-    ];
-
-    // Lista de Funcionários
-    const listaFuncionarios = [
-        "Mariana Souza",
-        "Carlos Eduardo",
-        "Roberto Alves",
-        "Fernanda Lima",
-        "Juliana Paes",
-        "Lucas Mendes",
-        "Beatriz Rocha"
-    ];
-
-    // Dados Iniciais dos Slots Predefinidos
-    const slotsIniciais = [
-        { esp: "Cardiologia", exameIdx: 0, func: "Mariana Souza", status: "pago", hora: "08:30" },
-        { esp: "Ortopedia e Traumatologia", exameIdx: 1, func: "Mariana Souza", status: "pago", hora: "09:15" },
-        { esp: "Ginecologia e Obstetrícia", exameIdx: 2, func: "Carlos Eduardo", status: "pendente", hora: "10:00" },
-        { esp: "Clínica Médica", exameIdx: 3, func: "Carlos Eduardo", status: "pendente", hora: "11:30" }
-    ];
-
-    let slotCount = 0;
-
-    function gerarOpcoesSelect(array, valorSelecionado = "", incluirEmBranco = true) {
-        let html = incluirEmBranco ? '<option value="">-- Selecione --</option>' : '';
-        array.forEach(item => {
-            const val = typeof item === 'object' ? item.nome : item;
-            const selected = val === valorSelecionado ? 'selected' : '';
-            html += `<option value="${val}" ${selected}>${val}</option>`;
-        });
-        return html;
-    }
-
-    function gerarOpcoesCodigos(valorSelecionado = "") {
-        let html = '<option value="">-- Selecione --</option>';
-        listaExames.forEach(exame => {
-            const selected = exame.codigo === valorSelecionado ? 'selected' : '';
-            html += `<option value="${exame.codigo}" ${selected}>${exame.codigo}</option>`;
-        });
-        return html;
-    }
-
-    function aoMudarExame(selectEl) {
-        const tr = selectEl.closest('tr');
-        const codSelect = tr.querySelector('.cod-select');
-        const valorInput = tr.querySelector('.valor-input');
-
-        const exameSelecionado = listaExames.find(e => e.nome === selectEl.value);
-
-        if (exameSelecionado) {
-            codSelect.value = exameSelecionado.codigo;
-            valorInput.value = exameSelecionado.valor;
-        } else {
-            codSelect.value = "";
-            valorInput.value = "";
+    // Carregar dados armazenados ou iniciar com o padrão
+    function obterPacientes() {
+        const armazenados = localStorage.getItem('lista_pacientes_materdei');
+        if (armazenados) {
+            return JSON.parse(armazenados);
         }
-        calcularTotal();
+        localStorage.setItem('lista_pacientes_materdei', JSON.stringify(pacientesPadrao));
+        return pacientesPadrao;
     }
 
-    function aoMudarCodigo(selectEl) {
-        const tr = selectEl.closest('tr');
-        const exameSelect = tr.querySelector('.exame-select');
-        const valorInput = tr.querySelector('.valor-input');
+    function salvarPacientes(lista) {
+        localStorage.setItem('lista_pacientes_materdei', JSON.stringify(lista));
+    }
 
-        const exameSelecionado = listaExames.find(e => e.codigo === selectEl.value);
+    function renderizarTabela(filtro = "") {
+        const tbody = document.getElementById('pacientesTableBody');
+        tbody.innerHTML = "";
+        const lista = obterPacientes();
 
-        if (exameSelecionado) {
-            exameSelect.value = exameSelecionado.nome;
-            valorInput.value = exameSelecionado.valor;
-        } else {
-            exameSelect.value = "";
-            valorInput.value = "";
+        const listaFiltrada = lista.filter(p => p.nome.toLowerCase().includes(filtro.toLowerCase()));
+
+        if (listaFiltrada.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="empty-message">Nenhum paciente encontrado.</td></tr>`;
+            return;
         }
-        calcularTotal();
-    }
 
-    function mudarCorStatus(select) {
-        if (select.value === 'pago') {
-            select.className = 'status-select status-pago';
-        } else if (select.value === 'pendente') {
-            select.className = 'status-select status-pendente';
-        } else {
-            select.className = 'status-select';
-        }
-        calcularTotal();
-    }
+        listaFiltrada.forEach(paciente => {
+            const tr = document.createElement('tr');
 
-    function criarLinhaSlot(dados = {}) {
-        slotCount++;
-        const tbody = document.querySelector('#faturamentoTable tbody');
-        const tr = document.createElement('tr');
+            const isLiberado = paciente.status.toLowerCase() === 'liberado';
+            const statusClass = isLiberado ? 'liberado' : 'pendente';
+            const statusText = isLiberado ? 'LIBERADO' : 'PENDENTE';
 
-        const espHtml = gerarOpcoesSelect(listaEspecialidades, dados.esp || "");
-        const exameHtml = gerarOpcoesSelect(listaExames, dados.exameObj ? dados.exameObj.nome : "");
-        const codHtml = gerarOpcoesCodigos(dados.exameObj ? dados.exameObj.codigo : "");
-        const funcHtml = gerarOpcoesSelect(listaFuncionarios, dados.func || "");
-        
-        const valorInicial = dados.exameObj ? dados.exameObj.valor : "";
-        const statusVal = dados.status || "";
-        const horaVal = dados.hora || "12:00";
-        
-        let statusClass = "status-select";
-        if (statusVal === "pago") statusClass += " status-pago";
-        if (statusVal === "pendente") statusClass += " status-pendente";
-
-        tr.innerHTML = `
-            <td><strong>#${slotCount}</strong></td>
-            <td>
-                <select class="esp-select">
-                    ${espHtml}
-                </select>
-            </td>
-            <td>
-                <select class="exame-select" onchange="aoMudarExame(this)">
-                    ${exameHtml}
-                </select>
-            </td>
-            <td>
-                <select class="cod-select" style="text-align: center;" onchange="aoMudarCodigo(this)">
-                    ${codHtml}
-                </select>
-            </td>
-            <td>
-                <input type="text" value="${valorInicial}" placeholder="0,00" class="valor-input" oninput="calcularTotal()">
-            </td>
-            <td>
-                <select class="func-select">
-                    ${funcHtml}
-                </select>
-            </td>
-            <td>
-                <select class="${statusClass}" onchange="mudarCorStatus(this)">
-                    <option value="" ${statusVal === "" ? "selected" : ""}>-- Selecione --</option>
-                    <option value="pago" ${statusVal === "pago" ? "selected" : ""}>Pago</option>
-                    <option value="pendente" ${statusVal === "pendente" ? "selected" : ""}>Pendente</option>
-                </select>
-            </td>
-            <td><input type="text" value="${horaVal}" style="text-align: center;"></td>
-            <td><button class="btn btn-danger" onclick="removerSlot(this)">✕</button></td>
-        `;
-        tbody.appendChild(tr);
-    }
-
-    function adicionarSlot() {
-        criarLinhaSlot();
-        calcularTotal();
-    }
-
-    function removerSlot(btn) {
-        const tr = btn.closest('tr');
-        tr.remove();
-        recalcularIndicesSlots();
-        calcularTotal();
-    }
-
-    function recalcularIndicesSlots() {
-        const rows = document.querySelectorAll('#faturamentoTable tbody tr');
-        slotCount = 0;
-        rows.forEach(tr => {
-            slotCount++;
-            tr.cells[0].innerHTML = `<strong>#${slotCount}</strong>`;
+            tr.innerHTML = `
+                <td><strong>${paciente.nome}</strong></td>
+                <td style="text-align: center;">
+                    <a href="faturamento.html?id=${paciente.id}" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;">
+                        📄 Abrir Planilha
+                    </a>
+                </td>
+                <td style="text-align: center;">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </td>
+                <td style="text-align: center; font-weight: 600;">${paciente.hora}</td>
+                <td style="text-align: center;">
+                    <button class="btn-danger" onclick="confirmarDelecao(${paciente.id}, '${paciente.nome}')">✕ Deletar</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
         });
     }
 
-    function calcularTotal() {
-        const inputs = document.querySelectorAll('.valor-input');
-        let total = 0;
-        let temPendente = false;
-
-        inputs.forEach(input => {
-            let valStr = input.value.replace(/\./g, '').replace(',', '.');
-            let val = parseFloat(valStr);
-            if (!isNaN(val)) {
-                total += val;
-            }
-        });
-
-        // Verificar status dos lançamentos
-        const statusSelects = document.querySelectorAll('.status-select');
-        statusSelects.forEach(sel => {
-            if (sel.value === 'pendente') {
-                temPendente = true;
-            }
-        });
-
-        document.getElementById('lblTotal').innerText = 'R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        
-        // Ler Caução do Input
-        let caucaoStr = document.getElementById('inputCaucao').value.replace(/\./g, '').replace(',', '.');
-        let caucao = parseFloat(caucaoStr);
-        if (isNaN(caucao)) caucao = 0;
-
-        document.getElementById('lblCaucao').innerText = 'R$ ' + caucao.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-
-        const saldo = caucao - total;
-        const saldoEl = document.getElementById('lblSaldo');
-        
-        if (saldo >= 0) {
-            saldoEl.style.color = 'var(--success)';
-            saldoEl.innerText = 'R$ ' + saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' (Crédito)';
-        } else {
-            saldoEl.style.color = 'var(--danger)';
-            saldoEl.innerText = 'R$ ' + Math.abs(saldo).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' (A Pagar)';
+    function adicionarNovoPaciente() {
+        const nome = prompt("Digite o nome completo do novo paciente:");
+        if (nome === null || nome.trim() === "") {
+            return; // Cancelado ou vazio
         }
 
-        // Atualizar Quadrado de Status no Canto Inferior Esquerdo (LIBERADO / PENDENTE)
-        const statusBox = document.getElementById('statusBox');
-        const statusBoxText = document.getElementById('statusBoxText');
-        const statusBoxIcon = document.getElementById('statusBoxIcon');
+        const agora = new Date();
+        const horas = String(agora.getHours()).padStart(2, '0');
+        const minutos = String(agora.getMinutes()).padStart(2, '0');
+        const horaAtual = `${horas}:${minutos}`;
 
-        if (!temPendente && saldo >= 0) {
-            statusBox.className = 'status-box liberado';
-            statusBoxText.innerText = 'LIBERADO';
-            statusBoxIcon.innerText = '✔';
-        } else {
-            statusBox.className = 'status-box pendente';
-            statusBoxText.innerText = 'PENDENTE';
-            statusBoxIcon.innerText = '✖';
+        const lista = obterPacientes();
+        const novoPaciente = {
+            id: Date.now(),
+            nome: nome.trim(),
+            status: "pendente", // Todo novo paciente inicia como pendente por padrão
+            hora: horaAtual
+        };
+
+        lista.push(novoPaciente);
+        salvarPacientes(lista);
+        renderizarTabela();
+    }
+
+    function confirmarDelecao(id, nome) {
+        const certeza = confirm(`Tem certeza que deseja deletar o paciente "${nome}"?`);
+        if (certeza) {
+            let lista = obterPacientes();
+            lista = lista.filter(p => p.id !== id);
+            salvarPacientes(lista);
+            renderizarTabela(document.getElementById('searchInput').value);
         }
     }
 
-    // Inicialização da Página
+    function filtrarPacientes() {
+        const termo = document.getElementById('searchInput').value;
+        renderizarTabela(termo);
+    }
+
+    // Renderização inicial ao carregar a página
     window.onload = function() {
-        slotsIniciais.forEach(item => {
-            criarLinhaSlot({
-                esp: item.esp,
-                exameObj: listaExames[item.exameIdx],
-                func: item.func,
-                status: item.status,
-                hora: item.hora
-            });
-        });
-        calcularTotal();
+        renderizarTabela();
     };
 </script>
 
